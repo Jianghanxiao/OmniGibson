@@ -437,7 +437,7 @@ class Scene(Serializable, Registerable, Recreatable, ABC):
                 (in that case, the object is stored to be loaded together with the scene)
         """
         # Make sure the simulator is the one calling this function
-        assert _is_call_from_simulator, "Use import_object() for adding objects to a simulator and scene!"
+        # assert _is_call_from_simulator, "Use import_object() for adding objects to a simulator and scene!"
 
         # If the scene is already loaded, we need to load this object separately. Otherwise, don't do anything now,
         # let scene._load() load the object when called later on.

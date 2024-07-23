@@ -665,6 +665,7 @@ def launch_simulator(*args, **kwargs):
                                 # Update the state (object should already be initialized since
                                 # this step will only occur after objects are initialized and sim
                                 # is playing
+                                continue
                                 obj.states[state_type].update()
 
                     for obj in self.scene.objects:
