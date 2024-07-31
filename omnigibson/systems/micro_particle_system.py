@@ -1590,11 +1590,6 @@ class Cloth(MicroParticleSystem):
             # We always load into trimesh to remove redundant particles (since natively omni redundantly represents
             # the number of vertices as 6x the total unique number of vertices)
             tm = mesh_prim_to_trimesh_mesh(mesh_prim=mesh_prim, include_normals=True, include_texcoord=True, world_frame=False)
-            print("Before remeshing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", tm.is_watertight)
-            # broken = trimesh.repair.broken_faces(m, color=[255,0,0,255])
-            # print("broken faces num:", len(broken))
-            # import pdb
-            # pdb.set_trace()
             texcoord = np.array(mesh_prim.GetAttribute("primvars:st").Get()) if has_uv_mapping else None
         else:
             # We will remesh in pymeshlab, but it doesn't allow programmatic construction of a mesh with texcoords so
@@ -1629,6 +1624,8 @@ class Cloth(MicroParticleSystem):
                         break
 
                     ms.meshing_isotropic_explicit_remeshing(iterations=5, adaptive=True, targetlen=pymeshlab.AbsoluteValue(particle_distance))
+                    ms.meshing_repair_non_manifold_edges()
+                    ms.meshing_repair_non_manifold_vertices()
                     avg_edge_percentage_mismatch = abs(1.0 - particle_distance / ms.get_geometric_measures()["avg_edge_length"])
                 else:
                     # Terminate anyways, but don't fail
@@ -1668,19 +1665,6 @@ class Cloth(MicroParticleSystem):
             mesh_prim.GetAttribute("primvars:st").Set(lazy.pxr.Vt.Vec2fArray.FromNumpy(texcoord))
 
         # Convert into particle cloth
-        # lazy.omni.physx.scripts.particleUtils.add_physx_particle_cloth(
-        #     stage=og.sim.stage,
-        #     path=mesh_prim.GetPath(),
-        #     dynamic_mesh_path=None,
-        #     particle_system_path=cls.system_prim_path,
-        #     spring_stretch_stiffness=m.CLOTH_STRETCH_STIFFNESS,
-        #     spring_bend_stiffness=m.CLOTH_BEND_STIFFNESS,
-        #     spring_shear_stiffness=m.CLOTH_SHEAR_STIFFNESS,
-        #     spring_damping=m.CLOTH_DAMPING,
-        #     self_collision=True,
-        #     self_collision_filter=True,
-        # )
-
         lazy.omni.physx.scripts.particleUtils.add_physx_particle_cloth(
             stage=og.sim.stage,
             path=mesh_prim.GetPath(),
@@ -1690,7 +1674,7 @@ class Cloth(MicroParticleSystem):
             spring_bend_stiffness=m.CLOTH_BEND_STIFFNESS,
             spring_shear_stiffness=m.CLOTH_SHEAR_STIFFNESS,
             spring_damping=m.CLOTH_DAMPING,
-            self_collision=False,
+            self_collision=True,
             self_collision_filter=True,
         )
 
