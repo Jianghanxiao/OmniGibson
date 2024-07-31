@@ -1624,8 +1624,6 @@ class Cloth(MicroParticleSystem):
                         break
 
                     ms.meshing_isotropic_explicit_remeshing(iterations=5, adaptive=True, targetlen=pymeshlab.AbsoluteValue(particle_distance))
-                    ms.meshing_repair_non_manifold_edges()
-                    ms.meshing_repair_non_manifold_vertices()
                     avg_edge_percentage_mismatch = abs(1.0 - particle_distance / ms.get_geometric_measures()["avg_edge_length"])
                 else:
                     # Terminate anyways, but don't fail
@@ -1641,6 +1639,11 @@ class Cloth(MicroParticleSystem):
                     break
             else:
                 raise ValueError(f"Could not remesh with less than MAX_CLOTH_PARTICLES ({m.MAX_CLOTH_PARTICLES}) vertices!")
+
+            # Make sure the mesh is manifold
+            ms.meshing_repair_non_manifold_edges()
+            ms.meshing_repair_non_manifold_vertices()
+            cm = ms.current_mesh()
 
             # Re-write data to @mesh_prim
             new_faces = cm.face_matrix()
