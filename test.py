@@ -15,13 +15,13 @@ for category in all_categories:
         for model in get_all_object_category_models(category):
             cloth_category_models.append((category, model))
 
-cloth_category_models = [
-    ("carpet", "ctclvd"),
-]
-
 # cloth_category_models = [
-#     ("bandana", "wbhliu"),
+#     ("carpet", "ctclvd"),
 # ]
+
+cloth_category_models = [
+    ("bandana", "wbhliu"),
+]
 
 # cloth_category_models = [
 #     ("apron", "uxgjdv"),
@@ -39,7 +39,7 @@ env = og.Environment(cfg)
 og.sim.stop()
 
 for category, model in cloth_category_models:
-    obj = DatasetObject(name="obj", category=category, model=model, prim_type=PrimType.CLOTH, load_config={"remesh": True}, scale=0.5)
+    obj = DatasetObject(name="obj", category=category, model=model, prim_type=PrimType.CLOTH, load_config={"remesh": False}, scale=0.5)
     # obj = DatasetObject(name="obj", category=category, model=model, prim_type=PrimType.RIGID, scale=0.5)
     env.scene.add_object(obj)
     obj.set_position([-obj.aabb_center[0], -obj.aabb_center[1], -obj.aabb_center[2] + obj.aabb_extent[2] / 2.0])
