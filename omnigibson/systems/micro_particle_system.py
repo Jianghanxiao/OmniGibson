@@ -1597,6 +1597,14 @@ class Cloth(MicroParticleSystem):
             scaled_world_transform = PoseAPI.get_world_pose_with_scale(mesh_prim.GetPath().pathString)
             # Convert to trimesh mesh (in world frame)
             tm = mesh_prim_to_trimesh_mesh(mesh_prim=mesh_prim, include_normals=True, include_texcoord=True, world_frame=True)
+            components = tm.split(only_watertight=False)
+            if len(components) > 1:
+            # Combine all components into a single mesh
+                tm = trimesh.util.concatenate(components)
+                # Additional step: Perform edge collapsing or smoothing to merge vertices that are close to each other
+                tm.merge_vertices()
+                tm.process()
+            print("Before remeshing", tm.is_watertight)
             # Tmp file written to: {tmp_dir}/{tmp_fname}/{tmp_fname}.obj
             tmp_name = str(uuid.uuid4())
             tmp_dir = os.path.join(tempfile.gettempdir(), tmp_name)
@@ -1626,6 +1634,12 @@ class Cloth(MicroParticleSystem):
                     ms.meshing_isotropic_explicit_remeshing(iterations=5, adaptive=True, targetlen=pymeshlab.AbsoluteValue(particle_distance))
                     ms.meshing_repair_non_manifold_edges()
                     ms.meshing_repair_non_manifold_vertices()
+                    
+                    # ms.meshing_remove_duplicate_faces()
+                    ms.meshing_remove_connected_component_by_face_number(mincomponentsize=100)
+                    # print(ms.compute_selection_by_small_disconnected_components_per_face(nbfaceratio=1, nbneighbors=2))
+                    # ms.meshing_remove_connected_component_by_diameter()
+                    # ms.meshing_remove_connected_component_by_face_number()
                     avg_edge_percentage_mismatch = abs(1.0 - particle_distance / ms.get_geometric_measures()["avg_edge_length"])
                 else:
                     # Terminate anyways, but don't fail
@@ -1654,6 +1668,30 @@ class Cloth(MicroParticleSystem):
             )
             # Apply the inverse of the world transform to get the mesh back into its local frame
             tm.apply_transform(np.linalg.inv(scaled_world_transform))
+            components = tm.split(only_watertight=False)
+            if len(components) > 1:
+            # Combine all components into a single mesh
+                tm = trimesh.util.concatenate(components)
+
+                # Additional step: Perform edge collapsing or smoothing to merge vertices that are close to each other
+                tm.merge_vertices()
+                tm.process()
+        print("After remeshing", tm.is_watertight)
+        # tm.remove_duplicate_faces()
+        # tm.remove_degenerate_faces()
+        # tm.remove_unreferenced_vertices()
+        # tm.merge_vertices()
+        # tm.process()
+        
+        
+
+        # num = trimesh.graph.connected_components(tm.face_adjacency, min_len=3)
+        # print("Number of connected components", num)
+        # mask = np.zeros(len(tm.faces), dtype=bool)
+        # mask[np.concatenate(num)] = True
+        # tm.update_faces(mask)
+        # print(np.sum(mask == True))
+        # print(np.sum(mask == False))
 
         # Update the mesh prim
         face_vertex_counts = np.array([len(face) for face in tm.faces], dtype=int)
