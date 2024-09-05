@@ -1639,7 +1639,11 @@ class Cloth(MicroParticleSystem):
                             # print("face_number:", face_num)
                             if face_num > biggest_face_num:
                                 biggest_face_num = face_num
-                        ms.meshing_remove_connected_component_by_face_number(mincomponentsize=biggest_face_num - 1, removeunref=False)
+                        new_ms = pymeshlab.MeshSet()
+                        for split_mesh in ms:
+                            if split_mesh.face_number() == biggest_face_num:
+                                new_ms.add_mesh(split_mesh)
+                        ms = new_ms
 
                     avg_edge_percentage_mismatch = abs(1.0 - particle_distance / ms.get_geometric_measures()["avg_edge_length"])
                 else:
