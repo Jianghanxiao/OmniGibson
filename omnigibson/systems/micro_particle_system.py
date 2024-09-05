@@ -1610,6 +1610,7 @@ class Cloth(MicroParticleSystem):
             particle_distance = cls.particle_contact_offset * 2 / 1.5 if particle_distance is None else particle_distance
 
             # Repetitively re-mesh at lower resolution until we have a mesh that has less than MAX_CLOTH_PARTICLES vertices
+            flag = False
             for _ in range(10):
                 ms = pymeshlab.MeshSet()
                 ms.load_new_mesh(tmp_fpath)
@@ -1629,13 +1630,22 @@ class Cloth(MicroParticleSystem):
                     ms.meshing_repair_non_manifold_edges()
                     ms.meshing_repair_non_manifold_vertices()
                     
+                    # import pdb
+                    # pdb.set_trace()
                     # ms.meshing_remove_duplicate_faces()
                     ms.generate_splitting_by_connected_components(delete_source_mesh=True)
+                    if flag == False:
+                        with open('/home/hanxiao/Desktop/Research/bh_cloth/OmniGibson/log.txt', 'a') as file:
+                            file.write(f":::::::::::::::::{mesh_prim.GetParent().GetName()} has {len(ms)} connected components!!!!!!!!!!!!!!!!\n")
                     if len(ms) > 1:
+                        if flag == False:
+                            with open('/home/hanxiao/Desktop/Research/bh_cloth/OmniGibson/multiple.txt', 'a') as file:
+                                file.write(f"{mesh_prim.GetParent().GetName()}\n")
                         log.warn(f"The cloth mesh has {len(ms)} disconnected pieces. To simplify, we only keep the mesh with largest face number.")
                         biggest_face_num = 0
                         for split_mesh in ms:
                             face_num = split_mesh.face_number()
+                            print("face_number:", face_num)
                             # print("face_number:", face_num)
                             if face_num > biggest_face_num:
                                 biggest_face_num = face_num
@@ -1644,8 +1654,8 @@ class Cloth(MicroParticleSystem):
                             if split_mesh.face_number() == biggest_face_num:
                                 new_ms.add_mesh(split_mesh)
                         ms = new_ms
-
                     avg_edge_percentage_mismatch = abs(1.0 - particle_distance / ms.get_geometric_measures()["avg_edge_length"])
+                    flag = True
                 else:
                     # Terminate anyways, but don't fail
                     log.warn("The generated cloth may not have evenly distributed particles.")
