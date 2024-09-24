@@ -18,7 +18,7 @@ def main(random_selection=False, headless=False, short_exec=False):
     og.log.info(f"Demo {__file__}\n    " + "*" * 80 + "\n    Description:\n" + main.__doc__ + "*" * 80)
 
     # Read the json file
-    with open("/home/hanxiao/Desktop/Research/behavior/OmniGibson/cloth_models.json") as f:
+    with open("/home/mingtong/OmniGibson/cloth_models.json") as f:
         cloth_objects = json.load(f)
 
     for cloth in cloth_objects:
@@ -36,8 +36,8 @@ def main(random_selection=False, headless=False, short_exec=False):
                 {
                     "type": "DatasetObject",
                     "name": model,
-                    "category": category,
-                    "model": model,
+                    "category": 'carpet',
+                    "model": 'sehjcp',
                     # "bounding_box": [0.897, 0.568, 0.012],
                     "prim_type": PrimType.CLOTH,
                     "abilities": {"cloth": {}},
@@ -70,7 +70,7 @@ def main(random_selection=False, headless=False, short_exec=False):
             pos = obj.root_link.compute_particle_positions()
 
             # Get the center of x and y
-            indices = np.argsort(pos, axis=0)[:, 2][-len(pos)//5:]
+            indices = np.argsort(pos, axis=0)[:, 2][-len(pos)//2:]
             # indices = np.array([indices])
             start = np.copy(pos[indices])
             end = np.copy(start)

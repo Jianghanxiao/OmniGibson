@@ -34,12 +34,12 @@ m = create_module_macros(module_path=__file__)
 m.MAX_CLOTH_PARTICLES = 20000  # Comes from a limitation in physx - do not increase
 m.CLOTH_PARTICLE_CONTACT_OFFSET = 0.0075
 m.CLOTH_REMESHING_ERROR_THRESHOLD = 0.05
-m.CLOTH_STRETCH_STIFFNESS = 10000.0
-m.CLOTH_BEND_STIFFNESS = 200.0
-m.CLOTH_SHEAR_STIFFNESS = 100.0
-m.CLOTH_DAMPING = 0.2
+m.CLOTH_STRETCH_STIFFNESS = 100.0
+m.CLOTH_BEND_STIFFNESS = 50.0
+m.CLOTH_SHEAR_STIFFNESS = 70.0
+m.CLOTH_DAMPING = 0.02
 m.CLOTH_FRICTION = 0.4
-m.CLOTH_DRAG = 0.001
+m.CLOTH_DRAG = 0.02
 m.CLOTH_LIFT = 0.003
 m.MIN_PARTICLE_CONTACT_OFFSET = 0.005   # Minimum particle contact offset for physical micro particles
 m.FLUID_PARTICLE_PARTICLE_DISTANCE_SCALE = 0.8   # How much overlap expected between fluid particles at rest
