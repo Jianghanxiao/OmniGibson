@@ -81,12 +81,11 @@ def main(random_selection=False, headless=False, short_exec=False):
                     og.sim.step()
 
 
-            obj = objs[0]
             pos = obj.root_link.compute_particle_positions()
             y_min = np.min(pos[:, 1])
             y_max = np.max(pos[:, 1])
             y_mid = (y_min + y_max) / 2
-            indices = np.argsort(pos, axis=1)[:, 0][-len(pos)//2:]
+            indices = np.argsort(pos, axis=0)[:, 1][-len(pos)//2:]
             start = np.copy(pos[indices])
             end = np.copy(start)
             end[:, 1] = 2*y_mid - end[:, 1]
