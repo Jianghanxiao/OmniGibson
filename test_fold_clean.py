@@ -65,6 +65,7 @@ def main(random_selection=False, headless=False, short_exec=False):
         print("\nCloth state:\n")
 
         if not short_exec:
+            # Deal with x
             obj = objs[0]
             pos = obj.root_link.compute_particle_positions()
             x_min = np.min(pos[:, 0])
@@ -77,10 +78,18 @@ def main(random_selection=False, headless=False, short_exec=False):
 
             increments = 100
             for ctrl_pts in np.linspace(start, end, increments):
-                    obj.root_link.set_particle_positions(ctrl_pts, idxs=indices)
-                    og.sim.step()
+                obj.root_link.set_particle_positions(ctrl_pts, idxs=indices)
+                og.sim.step()
 
+            # pos = obj.root_link.compute_particle_positions()
+            # indices = np.argsort(pos, axis=0)[:, 0][:-int(len(pos)/5*4)]
+            # start = np.copy(pos[indices])
+            # for i in range(30):
+            #     obj.root_link.set_particle_positions(start, idxs=indices)
+            #     og.sim.step()
+            
 
+            # Deal with y
             pos = obj.root_link.compute_particle_positions()
             y_min = np.min(pos[:, 1])
             y_max = np.max(pos[:, 1])
@@ -92,8 +101,16 @@ def main(random_selection=False, headless=False, short_exec=False):
 
             increments = 100
             for ctrl_pts in np.linspace(start, end, increments):
-                    obj.root_link.set_particle_positions(ctrl_pts, idxs=indices)
-                    og.sim.step()
+                obj.root_link.set_particle_positions(ctrl_pts, idxs=indices)
+                og.sim.step()
+
+            # pos = obj.root_link.compute_particle_positions()
+            # indices = np.argsort(pos, axis=0)[:, 1][:-int(len(pos)/5*4)]
+            # start = np.copy(pos[indices])
+            # for i in range(30):
+            #     obj.root_link.set_particle_positions(start, idxs=indices)
+            #     og.sim.step()
+
 
             while True:
                 print(f"\nCategory: {category}, Model: {model}!!!!!!!!!!!!!!!!!!!!!!!!!!")
