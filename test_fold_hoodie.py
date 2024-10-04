@@ -18,7 +18,7 @@ def main(random_selection=False, headless=False, short_exec=False):
     og.log.info(f"Demo {__file__}\n    " + "*" * 80 + "\n    Description:\n" + main.__doc__ + "*" * 80)
 
     # Read the json file
-    with open("/home/mingtong/OmniGibson/cloth_models.json") as f:
+    with open("/home/hanxiao/Desktop/Research/behavior/OmniGibson/cloth_models.json") as f:
         cloth_objects = json.load(f)
 
     for cloth in cloth_objects:
