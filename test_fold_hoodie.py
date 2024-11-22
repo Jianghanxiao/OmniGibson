@@ -139,7 +139,7 @@ def main(random_selection=False, headless=False, short_exec=False):
             bottom_end[:, 1] = 2 * y_mid_bottom - bottom_end[:, 1]  # Mirror bottom to the above of y_mid_bottom
 
             # Perform the bottom fold
-            increments = 100
+            increments = 1000
             for ctrl_pts in np.linspace(bottom_start, bottom_end, increments):
                 obj.root_link.set_particle_positions(ctrl_pts, idxs=bottom_indices)
                 og.sim.step()
@@ -196,7 +196,7 @@ def main(random_selection=False, headless=False, short_exec=False):
             end[:, 0] = 2 * x_mid - end[:, 0]  # Mirror positions along the x-axis
 
             # Perform the folding operation in increments
-            increments = 100
+            increments = 1000
             for ctrl_pts in np.linspace(start, end, increments):
                 obj.root_link.set_particle_positions(ctrl_pts, idxs=indices)
                 og.sim.step()

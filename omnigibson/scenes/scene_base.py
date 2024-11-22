@@ -19,6 +19,8 @@ from omnigibson.objects.dataset_object import DatasetObject
 from omnigibson.systems.system_base import SYSTEM_REGISTRY, clear_all_systems, get_system
 from omnigibson.objects.light_object import LightObject
 from omnigibson.robots.robot_base import m as robot_macros
+import torch
+import omnigibson.utils.transform_utils as T
 
 # Create module logger
 log = create_module_logger(module_name=__name__)
@@ -628,6 +630,51 @@ class Scene(Serializable, Registerable, Recreatable, ABC):
             semantic_label="floors",
             type_label="class",
         )
+
+        def generate_box(box_half_extent=torch.tensor([1, 1, 1], dtype=torch.float32)):
+            # Temp function to generate the walls for squeezing the cloth
+            # The floor plane already exists
+            # We just need to generate the side planes
+            plane_centers = torch.tensor([
+                [1, 0, 1],
+                [0, 1, 1],
+                [-1, 0, 1],
+                [0, -1, 1],
+            ]) * box_half_extent
+            plane_prims = []
+            plane_motions = []
+            for i, pc in enumerate(plane_centers):
+
+                plane = lazy.omni.isaac.core.objects.ground_plane.GroundPlane(
+                    prim_path=f"/World/plane_{i}",
+                    name=f"plane_{i}",
+                    z_position=0,
+                    size=box_half_extent[2].item(),
+                    color=None,
+                    visible=False,
+                )
+
+                plane_as_prim = XFormPrim(
+                    prim_path=plane.prim_path,
+                    name=plane.name,
+                )
+                
+                # Build the plane orientation from the plane normal
+                horiz_dir = pc - torch.tensor([0, 0, box_half_extent[2]])
+                plane_z = -1 * horiz_dir / torch.norm(horiz_dir)
+                plane_x = torch.tensor([0, 0, 1], dtype=torch.float32)
+                plane_y = torch.cross(plane_z, plane_x)
+                plane_mat = torch.stack([plane_x, plane_y, plane_z], dim=1)
+                plane_quat = T.mat2quat(plane_mat)
+                plane_as_prim.set_position_orientation(pc, plane_quat)
+
+                plane_prims.append(plane_as_prim)
+                plane_motions.append(plane_z)
+            return plane_prims, plane_motions
+        
+        plane_prims, plane_motions = generate_box()
+        self.plane_prims = plane_prims
+        self.plane_motions = plane_motions
 
     def update_initial_state(self, state=None):
         """
