@@ -8,6 +8,8 @@ import omnigibson.lazy as lazy
 import json
 import torch
 import time
+import trimesh 
+from scipy.spatial import cKDTree
 # Make sure object states and GPU dynamics are enabled (GPU dynamics needed for cloth)
 gm.ENABLE_OBJECT_STATES = True
 gm.USE_GPU_DYNAMICS = True
@@ -82,7 +84,7 @@ def main(random_selection=False, headless=False, short_exec=False):
   
                 end_position = np.array(position) + 0.9 * np.array(plane_motion)
 
-                increments = 1000
+                increments = 10
                 for ctrl_pts in np.linspace(position, end_position, increments):
                     plane_prim.set_position(ctrl_pts)
                     og.sim.step()
@@ -109,12 +111,52 @@ def main(random_selection=False, headless=False, short_exec=False):
             #     og.sim.step()
 
 
-            while True:
+            # while True:
+            for i in range(100):
                 # print(f"\nCategory: {category}, Model: {model}!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 # obj.root_link.set_particle_positions(end)
                 
                 env.step(np.array([]))
 
+        obj = objs[0]
+        pos = obj.root_link.compute_particle_positions()
+
+
+        old_mesh = trimesh.load_mesh("test_origin.obj")
+        new_initial = trimesh.load_mesh("after.obj")
+
+        old_vertices = np.asarray(old_mesh.vertices)
+        new_vertices = np.asarray(new_initial.vertices)
+
+        # Get the correspondence between these two, for each vertice in old_mesh find the neightbours in new_initial, and save the weight
+        # Then leverage the saved neightbour index and weigth to get the new postion from current pos
+        # Build a KD-Tree for the new vertices
+        tree = cKDTree(new_vertices)
+
+        # Number of nearest neighbors
+        k = 10
+
+        # Find k nearest neighbors for each vertex in old_mesh
+        distances, indices = tree.query(old_vertices, k=k)
+
+        # Calculate weights based on inverse distances
+        weights = 1 / (distances + 1e-8)  # Adding a small value to avoid division by zero
+        weights /= weights.sum(axis=1, keepdims=True)
+
+        # Initialize array for new positions
+        new_positions = np.zeros_like(old_vertices)
+
+        # Interpolate new positions using the neighbors and weights
+        for i in range(old_vertices.shape[0]):
+            new_positions[i] = np.dot(weights[i], pos[indices[i]])
+
+        # Change the vertice position of the old mesh
+        old_mesh.vertices = new_positions
+
+        import pdb
+        pdb.set_trace()
+        
+        old_mesh.export("test_squeeze.obj")
         # Shut down env at the end
         print()
         env.close()

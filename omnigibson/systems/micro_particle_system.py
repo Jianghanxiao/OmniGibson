@@ -1597,7 +1597,6 @@ class Cloth(MicroParticleSystem):
             scaled_world_transform = PoseAPI.get_world_pose_with_scale(mesh_prim.GetPath().pathString)
             # Convert to trimesh mesh (in world frame)
             tm = mesh_prim_to_trimesh_mesh(mesh_prim=mesh_prim, include_normals=True, include_texcoord=True, world_frame=True)
-
             print("Before remeshing", tm.is_watertight)
             # Tmp file written to: {tmp_dir}/{tmp_fname}/{tmp_fname}.obj
             tmp_name = str(uuid.uuid4())
@@ -1605,6 +1604,7 @@ class Cloth(MicroParticleSystem):
             tmp_fpath = os.path.join(tmp_dir, f"{tmp_name}.obj")
             Path(tmp_dir).mkdir(parents=True, exist_ok=True)
             tm.export(tmp_fpath)
+            # tm.export("test_origin.obj")
 
             # Start with the default particle distance
             particle_distance = cls.particle_contact_offset * 2 / 1.5 if particle_distance is None else particle_distance
@@ -1673,6 +1673,7 @@ class Cloth(MicroParticleSystem):
             )
             # Apply the inverse of the world transform to get the mesh back into its local frame
             tm.apply_transform(np.linalg.inv(scaled_world_transform))
+            # tm.export("after.obj")
         print("After remeshing", tm.is_watertight)
 
         # Update the mesh prim
