@@ -1597,6 +1597,7 @@ class Cloth(MicroParticleSystem):
             scaled_world_transform = PoseAPI.get_world_pose_with_scale(mesh_prim.GetPath().pathString)
             # Convert to trimesh mesh (in world frame)
             tm = mesh_prim_to_trimesh_mesh(mesh_prim=mesh_prim, include_normals=True, include_texcoord=True, world_frame=True)
+            # tm.vertices /= 100
             print("Before remeshing", tm.is_watertight)
             # Tmp file written to: {tmp_dir}/{tmp_fname}/{tmp_fname}.obj
             tmp_name = str(uuid.uuid4())
@@ -1604,11 +1605,14 @@ class Cloth(MicroParticleSystem):
             tmp_fpath = os.path.join(tmp_dir, f"{tmp_name}.obj")
             Path(tmp_dir).mkdir(parents=True, exist_ok=True)
             tm.export(tmp_fpath)
+            import pdb
+            pdb.set_trace()
             # tm.export("test_origin.obj")
 
             # Start with the default particle distance
             particle_distance = cls.particle_contact_offset * 2 / 1.5 if particle_distance is None else particle_distance
-
+            import pdb
+            pdb.set_trace()
             # Repetitively re-mesh at lower resolution until we have a mesh that has less than MAX_CLOTH_PARTICLES vertices
             for _ in range(10):
                 ms = pymeshlab.MeshSet()
