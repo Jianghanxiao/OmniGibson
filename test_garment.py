@@ -20,7 +20,7 @@ cfg = {
                     "category": "pant", # (4)!
                     # "visual_only": True, # (5)!
                     "prim_type": PrimType.CLOTH,
-                    # "scale": [1/10, 1/10, 1/10], # (6)!
+                    "scale": [1/10, 1/10, 1/10], # (6)!
                     # "position": [1.0, 2.0, 0.001], # (7)!
                     # "orientation": [0, 0, 0, 1.0], # (8)!
                 }

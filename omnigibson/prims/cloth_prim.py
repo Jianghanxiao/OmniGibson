@@ -122,12 +122,6 @@ class ClothPrim(GeomPrim):
         dists = np.linalg.norm(positions - aabb_center.reshape(1, 3), axis=-1)
         self._centroid_idx = np.argmin(dists)
 
-    def _initialize(self):
-        super()._initialize()
-        # TODO (eric): hacky way to get cloth rendering to work (otherwise, there exist some rendering artifacts).
-        self._prim.CreateAttribute("primvars:isVolume", lazy.pxr.Sdf.ValueTypeNames.Bool, False).Set(True)
-        self._prim.GetAttribute("primvars:isVolume").Set(False)
-
         # Store the default position of the points in the local frame
         self._default_positions = np.array(self.get_attribute(attr="points"))
 

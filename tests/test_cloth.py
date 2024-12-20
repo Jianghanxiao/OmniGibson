@@ -4,7 +4,6 @@ from omnigibson.objects.dataset_object import DatasetObject
 from omnigibson.utils.constants import PrimType
 from omnigibson.utils.bddl_utils import OBJECT_TAXONOMY
 from omnigibson.utils.asset_utils import get_all_object_categories, get_all_object_category_models
-import pdb
 
 gm.USE_GPU_DYNAMICS = True
 all_categories = get_all_object_categories()

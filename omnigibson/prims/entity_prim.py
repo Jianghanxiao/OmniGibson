@@ -96,8 +96,8 @@ class EntityPrim(XFormPrim):
 
     def _post_load(self):
         # If this is a cloth, delete the root link and replace it with the single nested mesh
-        import pdb
-        pdb.set_trace()
+        # import pdb
+        # pdb.set_trace()
         if self._prim_type == PrimType.CLOTH:
             # Verify only a single link and a single mesh exists
             old_link_prim = None
@@ -111,8 +111,8 @@ class EntityPrim(XFormPrim):
                             assert cloth_mesh_prim is None, "Found multiple meshes for a Cloth entity prim! Expected: 1"
                             cloth_mesh_prim = child
             
-            # old_link_prim = self._prim.GetChildren()[1]
-            # cloth_mesh_prim = self._prim.GetChildren()[1]
+            old_link_prim = self._prim.GetChildren()[1]
+            cloth_mesh_prim = self._prim.GetChildren()[1]
 
             # Move mesh prim one level up via copy, then delete the original link
             # NOTE: We copy because we cannot directly move the prim because it is ancestral
@@ -124,13 +124,7 @@ class EntityPrim(XFormPrim):
             lazy.omni.kit.commands.execute("CopyPrim", path_from=cloth_mesh_prim.GetPath(), path_to=new_path)
             lazy.omni.kit.commands.execute("DeletePrims", paths=[old_link_prim.GetPath()], destructive=False)
 
-        # Setup links info FIRST before running any other post loading behavior
-        # We pass in scale explicitly so that the generated links can leverage the desired entity scale
         self.update_links()
-
-        # Optionally set the scale
-        if "scale" in self._load_config and self._load_config["scale"] is not None:
-            self.scale = self._load_config["scale"]
 
         # Prepare the articulation view.
         if self.n_joints > 0:
@@ -245,6 +239,7 @@ class EntityPrim(XFormPrim):
                 "kinematic_only": self._load_config.get("kinematic_only", False)
                 if link_name == self._root_link_name else False,
                 "remesh": self._load_config.get("remesh", True),
+                "scale": self._load_config.get("scale", None),
             }
             self._links[link_name] = link_cls(
                 prim_path=prim.GetPrimPath().__str__(),
